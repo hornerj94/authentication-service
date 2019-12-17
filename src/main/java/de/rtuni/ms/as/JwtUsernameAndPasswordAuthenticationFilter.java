@@ -1,10 +1,9 @@
-package de.rtuni.ms.as;
 /*
  * Copyright 2019 (C) by Julian Horner.
  * All Rights Reserved.
  */
 
-
+package de.rtuni.ms.as;
 
 import java.io.IOException;
 import java.util.Collections;
