@@ -73,12 +73,13 @@ public class JwtUsernameAndPasswordAuthenticationFilter
             HttpServletResponse response) throws AuthenticationException {
         try {
             // 1. Get credentials from request
-            UserCredentials creds =
+            UserCredentials credentials =
                     new ObjectMapper().readValue(request.getInputStream(), UserCredentials.class);
+            
             // 2. Create auth object (contains credentials) which will be used by auth manager
-            UsernamePasswordAuthenticationToken authToken = 
-                    new UsernamePasswordAuthenticationToken(
-                            creds.getUsername(), creds.getPassword(), Collections.emptyList());
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    credentials.getUsername(), credentials.getPassword(), Collections.emptyList());
+            
             // 3. Authentication manager authenticate the user, and use 
             // UserDetailsServiceImpl::loadUserByUsername() method to load the user.
 
