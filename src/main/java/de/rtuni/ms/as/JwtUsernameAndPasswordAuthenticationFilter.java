@@ -124,6 +124,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter
      * @author Julian
      *
      */
+    @SuppressWarnings("unused")
     private static class UserCredentials {
         private String username;        
         private String password;
