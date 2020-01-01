@@ -19,7 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
- * Class that handles security configuration.
+ * Class that enables custom security configuration.
  * 
  * @author Julian
  *
@@ -32,7 +32,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    /** The configuration for the json web token. */
+    /** The <code>JwtConfig</code> for the json web token. */
     @Autowired
     private JwtConfig jwtConfig;
 
@@ -48,8 +48,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
         // handle an authorized attempts 
         .exceptionHandling().authenticationEntryPoint(
-                (req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
-        .and()
+                (req, rsp, e) -> { 
+                    rsp.setContentType("application/json"); 
+                    rsp.setCharacterEncoding("UTF-8");
+                    rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED); 
+                }
+        ).and()
         
         /*
          * Add a filter to validate user credentials and add token in the response header.
@@ -58,8 +62,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
          * used to authenticate the user passing user's credentials. The filter needs this 
          * authentication manager to authenticate the user.
          */
-        .addFilter(
-                new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig))
+        .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(
+                authenticationManager(), jwtConfig))
         .authorizeRequests()
         // allow all POST requests 
         .antMatchers(HttpMethod.POST, jwtConfig.getUri()).permitAll()
@@ -67,13 +71,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .anyRequest().authenticated();
     }
     
+    // TODO improve comment
     /**
      * Spring has <code>UserDetailsService</code> interface, which can be overridden to provide our
      * implementation for fetching user from database (or any other source).
      * <p>
-     * The UserDetailsService object is used by the authentication manager to load the user
-     * from database. In addition, we need to define the password encoder also. So, authentication
-     * manager can compare and verify passwords.
+     * The <code>UserDetailsService</code> object is used by the authentication manager to load the
+     * user from database. In addition, we need to define the password encoder also. So, 
+     * authentication manager can compare and verify passwords.
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
