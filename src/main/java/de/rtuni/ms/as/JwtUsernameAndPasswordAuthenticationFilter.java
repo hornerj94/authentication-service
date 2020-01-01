@@ -66,23 +66,23 @@ public class JwtUsernameAndPasswordAuthenticationFilter
     //----------------------------------------------------------------------------------------------
 
     /**
-     * {@inheritDoc}
+     * Read the credentials from the given request and tries to authenticate them.
      */
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request,
-            HttpServletResponse response) throws AuthenticationException {
+    public Authentication attemptAuthentication(HttpServletRequest requ, HttpServletResponse resp)
+            throws AuthenticationException {
         try {
-            // 1. Get credentials from request
+            // Reads the credentials from the request body 
+            // and put them in a newly created UserCredentials object.
             UserCredentials credentials =
-                    new ObjectMapper().readValue(request.getInputStream(), UserCredentials.class);
+                    new ObjectMapper().readValue(requ.getInputStream(), UserCredentials.class);
             
-            // 2. Create auth object (contains credentials) which will be used by auth manager
+            // Creates an authentication token object with the credentials from the request
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     credentials.getUsername(), credentials.getPassword(), Collections.emptyList());
             
-            // 3. Authentication manager authenticate the user, and use 
-            // UserDetailsServiceImpl::loadUserByUsername() method to load the user.
-
+            // The manager tries to authenticate, it uses the loadUserByUsername() method in 
+            // UserDetailsServiceImpl to load one of the embedded user.
             return authManager.authenticate(authToken);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -92,38 +92,43 @@ public class JwtUsernameAndPasswordAuthenticationFilter
     //----------------------------------------------------------------------------------------------
 
     /**
-     * Upon successful authentication, generate a token. The 'auth' passed to
-     * successfulAuthentication() is the current authenticated user.
-     * 
-     * {@inheritDoc}
+     * Upon successful authentication, generate a token. The given <code>Authentication<code> object
+     * is the current authenticated user.
      */
     @Override
-    protected void successfulAuthentication(HttpServletRequest request,
-            HttpServletResponse response, FilterChain chain, Authentication auth)
-            throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest requ, HttpServletResponse resp,
+            FilterChain chain, Authentication auth) throws IOException, ServletException {
         Long now = System.currentTimeMillis();
+        
+        // Building of the token
         String token = Jwts.builder().setSubject(auth.getName())
-                // Convert to list of strings. This is important because it affects the way we 
-                // get them back in the Gateway.
+                
+                // Convert authorities to list of strings
+                // This is important because it affects the way we get them back in the Gateway
                 .claim("authorities",
                         auth.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                                .collect(Collectors.toList()))
+                        .collect(Collectors.toList()))
                 .setIssuedAt(new Date(now))
-                .setExpiration(new Date(now + jwtConfig.getExpiration() * 1000)) // in milliseconds
+                .setExpiration(new Date(now + jwtConfig.getExpiration() * 1000))
+                
+                // Sign the token with a hash-based message authentication code,sha256 hash function
+                // and the given secret
                 .signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret().getBytes()).compact();
 
-        // Add token to header
-        response.addHeader(jwtConfig.getHeader(), jwtConfig.getPrefix() + token);
+        // Add token to the header
+        resp.addHeader(jwtConfig.getHeader(), jwtConfig.getPrefix() + token);
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
     //----------------------------------------------------------------------------------------------
 
     /**
-     * A (temporary) class just to represent the user credentials.
+     * A (temporary) class to represent the user credentials.
      * 
      * @author Julian
      *
      */
+    @SuppressWarnings("unused")
     private static class UserCredentials {
         private String username;        
         private String password;

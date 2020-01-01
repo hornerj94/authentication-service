@@ -78,6 +78,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @author Julian
      *
      */
+    @SuppressWarnings("unused")
     private static class AppUser {
         private Integer id;
         private String username;
