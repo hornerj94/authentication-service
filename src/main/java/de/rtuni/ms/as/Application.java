@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 /**
- * Authentication service for microservice architecture.
+ * Class for starting authentication service.
  * 
  * @author Julian
  *
@@ -21,11 +21,11 @@ public class Application {
     //---------------------------------------------------------------------------------------------
     
     /**
-     * Starts the application.
+     * Start the application.
      * 
      * @param args The arguments
      */
-    public static void main(final String[] args) { SpringApplication.run(Application.class, args); }
+    public static void main(String[] args) { SpringApplication.run(Application.class, args); }
 
     //---------------------------------------------------------------------------------------------
 }

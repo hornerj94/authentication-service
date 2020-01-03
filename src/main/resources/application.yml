@@ -1,12 +1,10 @@
-# Spring properties
 spring:
   application:
-    name: auth-service  # Identify this application
+    name: auth-service  # Identifier of this application
 
-# HTTP Server
-server.port: 4444   # HTTP (Tomcat) port
+server.port: 4444
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/ # URL of the eureka server for registration
