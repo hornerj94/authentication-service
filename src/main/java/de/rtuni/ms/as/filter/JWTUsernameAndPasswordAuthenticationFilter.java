@@ -141,7 +141,6 @@ extends UsernamePasswordAuthenticationFilter {
 
         public String getPassword() { return password; }
         public void setPassword(final String value) { password = value; }
-         
     }
 
     //---------------------------------------------------------------------------------------------
