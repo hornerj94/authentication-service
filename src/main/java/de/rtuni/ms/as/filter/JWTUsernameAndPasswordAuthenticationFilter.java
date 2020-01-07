@@ -113,7 +113,7 @@ extends UsernamePasswordAuthenticationFilter {
                 .setExpiration(new Date(now + jwtConfiguration.getExpiration() * 1000))
 
                 // Signs the token with a hash-based message authentication code, a sha256 hash 
-                // function and the given secret.
+                // function and encrypt it with the given secret.
                 .signWith(SignatureAlgorithm.HS512, jwtConfiguration.getSecret().getBytes())
                 // Builds the JWT.
                 .compact();
